@@ -1,16 +1,139 @@
 // script.js
 
-const img = new Image(); // used to load image from <input> and draw to canvas
+let img = new Image(); // used to load image from <input> and draw to canvas
+img.src = 'favicon.ico';
+let c = document.getElementById('user-image');
+let ctx = c.getContext('2d');
+ctx.font = "30px Arial";
+let resetButton = document.querySelector("[type='reset']");
+let voiceButton = document.querySelector("[type='button']");
+let voiceDropdown = document.getElementById("voice-selection");
+toggle(voiceDropdown);
+voiceDropdown.remove(0);
+var synth = window.speechSynthesis;
+var volume;
+
 
 // Fires whenever the img object loads a new image (such as with img.src =)
 img.addEventListener('load', () => {
-  // TODO
+
+  let imageLoader = document.getElementById('image-input');
+  imageLoader.addEventListener('change', handleImage, false);
+
+
+function handleImage(e){
+  ctx.clearRect(0,0, c.width, c.height);
+  ctx.beginPath();
+  ctx.rect(0,0,c.width,c.height);
+  ctx.fillStyle = "black";
+  ctx.fill();
+  let reader = new FileReader();
+  reader.onload = function(event){
+      img = new Image();
+      img.onload = function(){
+          let dimensions = getDimmensions(c.width, c.height, img.width, img.height);
+          ctx.drawImage(img, dimensions.startX, dimensions.startY, dimensions.width, dimensions.height);
+      }
+      img.src = event.target.result;
+  }
+  reader.readAsDataURL(e.target.files[0]);     
+}
 
   // Some helpful tips:
   // - Fill the whole Canvas with black first to add borders on non-square images, then draw on top
   // - Clear the form when a new image is selected
   // - If you draw the image to canvas here, it will update as soon as a new image is selected
 });
+
+
+
+let generate = document.getElementById('generate-meme');
+generate.addEventListener('submit', e => {
+  e.preventDefault();
+  let topText = document.getElementById('text-top').value;
+  let bottomText = document.getElementById('text-bottom').value;
+  ctx.textAlign = "center";
+  ctx.fillText(topText, c.width/2, 30);
+  ctx.fillText(bottomText, c.width/2, c.height-10);
+  toggle(voiceButton);
+  toggle(resetButton);
+});
+
+function toggle(button)
+{
+  if(button.disabled==true){
+   button.disabled = false;}
+
+  else {
+   button.disabled=true;}
+}
+
+resetButton.addEventListener('click', () => {
+  ctx.clearRect(0,0, c.width, c.height);
+  toggle(resetButton);
+  toggle(voiceButton);
+  
+}); 
+
+voiceButton.addEventListener('click', () => {
+  
+  let voices = speechSynthesis.getVoices();
+  let utterThis = new SpeechSynthesisUtterance(document.getElementById('text-top').value + ' ' + document.getElementById('text-bottom').value);
+  let selectedOption = voiceDropdown.selectedOptions[0].getAttribute('data-name');
+  for(let i = 0; i < voices.length ; i++) {
+    if(voices[i].name === selectedOption) {
+      utterThis.voice = voices[i];
+    }
+  }
+  utterThis.volume = volume;
+  synth.speak(utterThis);
+});
+
+var volumeSlider = document.querySelector("[type='range']");
+volumeSlider.addEventListener('change', () => {
+  let vol = volumeSlider.value;
+  volume = vol;
+  let icon = document.querySelector("img");
+  if (vol >= 67 && vol <=100) {
+    icon.src = "icons/volume-level-3.svg";
+  }
+  else if (vol >= 34 && vol <=66) {
+    icon.src = "icons/volume-level-2.svg";
+  }
+  else if (vol >= 1 && vol <=33) {
+    icon.src = "icons/volume-level-1.svg";
+  }
+  else if (vol == 0) {
+    icon.src = "icons/volume-level-0.svg"
+  }
+});
+
+
+function populateVoiceList() {
+  if(typeof speechSynthesis === 'undefined') {
+    return;
+  }
+
+  var voices = speechSynthesis.getVoices();
+
+  for(var i = 0; i < voices.length; i++) {
+    var option = document.createElement('option');
+    option.textContent = voices[i].name + ' (' + voices[i].lang + ')';
+
+    if(voices[i].default) {
+      option.textContent += ' -- DEFAULT';
+    }
+
+    option.setAttribute('data-lang', voices[i].lang);
+    option.setAttribute('data-name', voices[i].name);
+    document.getElementById("voice-selection").appendChild(option);
+  }
+}
+
+populateVoiceList();
+if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
+  speechSynthesis.onvoiceschanged = populateVoiceList;
+}
 
 /**
  * Takes in the dimensions of the canvas and the new image, then calculates the new
