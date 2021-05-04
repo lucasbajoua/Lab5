@@ -91,16 +91,16 @@ voiceButton.addEventListener('click', () => {
 var volumeSlider = document.querySelector("[type='range']");
 volumeSlider.addEventListener('change', () => {
   let icon = document.querySelector("img");
-  if (vol >= 67 && vol <=100) {
+  if (volumeSlider.value >= 67 && volumeSlider.value <=100) {
     icon.src = "icons/volume-level-3.svg";
   }
-  else if (vol >= 34 && vol <=66) {
+  else if (volumeSlider.value >= 34 && volumeSlider.value <=66) {
     icon.src = "icons/volume-level-2.svg";
   }
-  else if (vol >= 1 && vol <=33) {
+  else if (volumeSlider.value >= 1 && volumeSlider.value <=33) {
     icon.src = "icons/volume-level-1.svg";
   }
-  else if (vol == 0) {
+  else if (volumeSlider.value == 0) {
     icon.src = "icons/volume-level-0.svg"
   }
 });
