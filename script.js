@@ -7,6 +7,7 @@ let ctx = c.getContext('2d');
 ctx.font = "30px Arial";
 let resetButton = document.querySelector("[type='reset']");
 let voiceButton = document.querySelector("[type='button']");
+let generateButton = document.querySelector("[type='submit']")
 let voiceDropdown = document.getElementById("voice-selection");
 toggle(voiceDropdown);
 voiceDropdown.remove(0);
@@ -54,6 +55,7 @@ generate.addEventListener('submit', e => {
   ctx.textAlign = "center";
   ctx.fillText(topText, c.width/2, 30);
   ctx.fillText(bottomText, c.width/2, c.height-10);
+  toggle(generateButton);
   toggle(voiceButton);
   toggle(resetButton);
 });
@@ -69,6 +71,7 @@ function toggle(button)
 
 resetButton.addEventListener('click', () => {
   ctx.clearRect(0,0, c.width, c.height);
+  toggle(generateButton);
   toggle(resetButton);
   toggle(voiceButton);
   
