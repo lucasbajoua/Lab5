@@ -11,7 +11,6 @@ let voiceDropdown = document.getElementById("voice-selection");
 toggle(voiceDropdown);
 voiceDropdown.remove(0);
 var synth = window.speechSynthesis;
-var volume;
 
 
 // Fires whenever the img object loads a new image (such as with img.src =)
@@ -85,14 +84,12 @@ voiceButton.addEventListener('click', () => {
       utterThis.voice = voices[i];
     }
   }
-  utterThis.volume = volume;
+  utterThis.volume = volumeSlider.value/100;
   synth.speak(utterThis);
 });
 
 var volumeSlider = document.querySelector("[type='range']");
 volumeSlider.addEventListener('change', () => {
-  let vol = volumeSlider.value;
-  volume = vol;
   let icon = document.querySelector("img");
   if (vol >= 67 && vol <=100) {
     icon.src = "icons/volume-level-3.svg";
